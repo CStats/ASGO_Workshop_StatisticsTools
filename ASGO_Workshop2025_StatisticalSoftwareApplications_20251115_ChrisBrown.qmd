@@ -1,0 +1,111 @@
+---
+title: "Statistical software and applications"
+subtitle: "Chris Brown, Univeristy of Sydney" 
+#"AOFOG / ASGO Gyn Oncology Research Workshop 2025"
+format: revealjs
+editor: visual
+---
+
+# Statistical software and applications
+
+\~60min including questions / interaction
+
+-   Questionnaire (0-5 mins, complete prior to talk?)
+
+-   Software (20 mins)
+
+-   Statistical tests (30 mins)
+
+-   Survey analysis / Questions (5-10 mins)
+
+# Software selection
+
+-   SAS
+
+-   SPSS
+
+-   Stata
+
+-   R
+
+-   Python
+
+Other common tools:
+
+-   REDCap
+
+-   Git
+
+\[ Outline for each: get from / how to use / tricks & tips\]
+
+## SAS
+
+long time industry standard, companies switching more to to R
+
+## SPSS
+
+GUI, was popular in medical community (easy to use), still powerful, python integration
+
+## STATA
+
+GUI, popular in Europe, less
+
+## R
+
+Open source, huge community, great intergrations
+
+## Python
+
+Powerful, open source, huge community, AI
+
+## REDCap
+
+Open source database system, can retrive data from software
+
+## Git
+
+Version control
+
+# Types of data
+
+-   Binary
+
+-   Categorical (ordered/unordered)
+
+-   Continuous
+
+-   Time-to-event
+
+# Common tests
+
+-   Comparing proportions
+
+-   Comparing continuous
+
+-   Comparing time-to-event
+
+# Modelling
+
+-   Regression
+
+    -    UV
+
+    -   MV
+
+    -   Repeated measures / clustering
+
+-   Time to event
+
+    -   Cox-proportional hazards
+
+    -   Competing risks
+
+# Analysis principles
+
+-   Reproducible mindset
+
+-   Version control
+
+-   Be kind to "future you" / others
+
+\[ Slides for each: coding / git / comments\]
