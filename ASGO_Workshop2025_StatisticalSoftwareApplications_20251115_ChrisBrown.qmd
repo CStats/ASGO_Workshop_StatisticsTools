@@ -38,6 +38,12 @@ Other common tools:
 
 \[ Outline for each: get from / how to use / tricks & tips\]
 
+## Popularity over time
+
+![](images/clipboard-1326217817.png)
+
+<https://www.kdnuggets.com/2010/06/software-popularity-of-data-analysis-software.html>
+
 ## SAS
 
 long time industry standard, companies switching more to to R
@@ -88,7 +94,7 @@ Version control
 
 -   Regression
 
-    -    UV
+    -   UV
 
     -   MV
 
