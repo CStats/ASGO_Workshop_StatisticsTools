@@ -56,6 +56,20 @@ cancer %>%
 
 # Time to event
 
+```{r}
+cancer %>%  
+  arrange(-time) %>%
+  mutate(order = 1:n()) %>% 
+  ggplot(aes(y=order, x=time, color=factor(status)))+
+  geom_point()+
+  geom_segment(aes(xstart=0, xend=time,yend=order),colour="black", x=0, alpha=0.5)+
+  ylab("Participant (ordered by time)")+
+  xlab("Time (days)")
+
+```
+
+
+
 ## Kaplan Meier
 
 ```{r}

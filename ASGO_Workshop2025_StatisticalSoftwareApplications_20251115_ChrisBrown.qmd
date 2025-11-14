@@ -23,9 +23,17 @@ editor: visual
 
 -   Survey analysis / Questions (5 mins)
 
-## Welcome survey
+::: notes
+-   Set survey timestamp now!
+:::
+
+## Welcome survey {.r-fit-text layout-ncol="2"}
+
+### Survey
 
 ![](images/clipboard-2128009121.png)
+
+### Slides
 
 -   Then check out these slides + example analysis code ([https://github.com/cstats](https://github.com/CStats/ASGO_Workshop_StatisticsTools){.uri})
 
@@ -49,6 +57,7 @@ editor: visual
 
 ::: notes
 -   R \> SPSS \> SAS \> R
+-   Today's prize for participating
 :::
 
 ## Survey results
@@ -71,6 +80,19 @@ rcon <- redcapConnection(
 data <- exportRecordsTyped(rcon) 
 ```
 
+```{r}
+library(dplyr)
+library(gtsummary)
+library(ggplot2)
+library(survival)
+library(survminer)
+
+data = data %>% 
+  mutate(time = as.POSIXct(pre_timestamp)) %>% 
+  mutate(time_diff = difftime(time,as.POSIXct("2025-11-15 01:37:00"),  units="mins")) %>% 
+  filter(time_diff>0)
+```
+
 ::: notes
 -   slides written with "chunks" of R, generated using RStudio
 :::
@@ -79,9 +101,7 @@ data <- exportRecordsTyped(rcon)
 
 ```{r}
 
-library(dplyr)
-library(gtsummary)
-library(ggplot2)
+
 
 data %>% 
   filter(!is.na(pre_timestamp)) %>% 
@@ -107,7 +127,8 @@ data %>%
       "software___r" = "R",
       "software___python" = "Python",
       "software___git" = "Git",
-      "software___redcap" = "REDCap"
+      "software___redcap" = "REDCap",
+      "software___other" = "Other"
     ),
   )
 
@@ -127,6 +148,39 @@ data %>%
   geom_text(aes(x=50, y=0.5,label="1 = More Software\n100 = More Statistics"),size=5
   )
 
+```
+
+## Survey results - Time to complete
+
+```{r}
+fit = survfit(Surv(as.numeric(time_diff), rep(1,nrow(data))) ~ 1, data = data)
+#plot(fit)
+
+ggsurvplot(
+    fit,                     # survfit object with calculated statistics.
+    data = data,  # data used to fit survival curves. 
+    ylab="completed survey (%)",
+    xlab="minutes",
+    break.time.by = 3,
+    conf.int = TRUE,
+    legend = "none",#c(0.81,0.97),
+    legned.title = "",
+    #pval=TRUE,
+    surv.scale = "percent",
+    #xlim= c(0,28),
+    break.y.by=0.1,
+    surv.median.line = "hv",
+    palette = c("darkblue","darkorange"),
+    #Standard configuration
+    risk.table = c("nrisk_cumcensor"),# show risk table.
+    ggtheme = theme_survminer()+theme(),
+    tables.theme = theme_void() + theme(plot.title = element_text(size =10)),
+    risk.table.y.text.col = T, # colour risk table text annotations.
+    risk.table.y.text = FALSE, # show bars instead of names in text annotations
+    axes.offset=FALSE,
+    risk.table.fontsize =3,
+    tables.height=0.2,
+)  
 ```
 
 # Statistical Software
@@ -185,6 +239,14 @@ Other common tools:
 -   Companies are diversifying and becoming comfortable with R/Python
 :::
 
+## SAS screenshot
+
+![](images/clipboard-1580301465.png)
+
+::: notes
+<https://sscc.wisc.edu/sscc/pubs/sas/SubmittingCode.html>
+:::
+
 ## SPSS
 
 <https://www.ibm.com/products/spss-statistics>
@@ -201,6 +263,10 @@ Other common tools:
 
 -   Syntax makes it reproducible
 :::
+
+## SPSS screenshot
+
+![](images/clipboard-378199739.png)
 
 ## STATA
 
@@ -220,6 +286,14 @@ Other common tools:
 -   (Heath) Economists love it.
 
 -   Outputting of reports is a step forward
+:::
+
+## STATA screenshot
+
+![](images/clipboard-179649262.png)
+
+::: notes
+<https://sscc.wisc.edu/sscc/pubs/sfs/sfs-ui.htm>
 :::
 
 ## R
@@ -248,6 +322,20 @@ Other common tools:
 -   Posit invested in the editor / packages that makes code easy
 
 -   AI can help you write code
+:::
+
+## R screenshot
+
+![](images/clipboard-1974645368.png)
+
+## R Shiny
+
+<https://shiny.posit.co/>
+
+![](images/clipboard-3517705219.png)
+
+::: notes
+<https://gallery.shinyapps.io/006-tabsets/>
 :::
 
 ## Python
@@ -289,6 +377,10 @@ Other common tools:
 -   Very useful if collaborating with others
 
 ![](images/clipboard-3781116804.png){width="153"}
+
+::: notes
+-   not always easy dealing with branches / merges
+:::
 
 ## Git - Problem
 
@@ -483,9 +575,29 @@ add_p(test=list(all_continuous() ~ "t.test"))
 
 ## Time to event - Data
 
-![](images/clipboard-951579380.png){width="508"}
+```{r}
+cancer_data = cancer %>%  
+  arrange(-time) %>%
+  mutate(order = 1:n()) %>% 
+  mutate(
+    months = time/30.4375,
+    sex = factor(sex, levels=c(1,2), labels=c("male","female")),
+    age_10 = age/10,
+    ecog = if_else(ph.ecog ==4, 3, ph.ecog),
+    ecog	= factor(ecog , levels=c(0,1,2,3), labels=c("0","1","2","3/4")),
+    ph.karno_10	 = ph.karno	/10,
+    meal.cal_1000 = meal.cal/1000,
+    wt.loss_10 = wt.loss/10
+  )
 
-![](images/clipboard-3746822751.png){width="291" height="18"}
+cancer_data %>% 
+  ggplot(aes(y=order, x=time))+
+  geom_point(data=cancer_data %>% filter(status==1),shape=4)+
+  geom_segment(aes(xstart=0, xend=time,yend=order),colour="black", x=0, alpha=0.5)+
+  ylab("Participant (ordered by time)")+
+  xlab("Time (days)")+
+  ggtitle("Survival time (censored marked with x)")
+```
 
 ::: notes
 -   replace with example data + R plots
@@ -494,17 +606,84 @@ add_p(test=list(all_continuous() ~ "t.test"))
 
 ## Kaplan Meier
 
-![](images/clipboard-2175826611.png)
+```{r, echo=TRUE}
+fit <- survfit(Surv(time, status) ~ 1, data = cancer)
+plot(fit)
+```
 
 ## Log-rank test
 
-![](images/clipboard-2794141736.png)
+```{r}
+
+    
+
+fit <- survfit(Surv(months, status) ~ sex, data= cancer_data)
+
+
+ggsurvplot(
+    fit,                     # survfit object with calculated statistics.
+    data = cancer_data,  # data used to fit survival curves. 
+    ylab="overall survival (%)",
+    xlab="months",
+    break.time.by = 3,
+    conf.int = FALSE,
+    legend = c(0.81,0.97),
+    legned.title = "",
+    pval=TRUE,
+    surv.scale = "percent",
+    xlim= c(0,28),
+    break.y.by=0.1,
+    surv.median.line = "hv",
+    palette = c("darkblue","darkorange"),
+    #Standard configuration
+    risk.table = c("nrisk_cumcensor"),# show risk table.
+    ggtheme = theme_survminer()+theme(),
+    tables.theme = theme_void() + theme(plot.title = element_text(size =10)),
+    risk.table.y.text.col = T, # colour risk table text annotations.
+    risk.table.y.text = FALSE, # show bars instead of names in text annotations
+    axes.offset=FALSE,
+    risk.table.fontsize =3,
+    tables.height=0.2,
+)
+```
 
 ::: notes
 -   log rank statistic: essentially squared difference between the average of the two curves / variance of this.
-
--   No assumptions
 :::
+
+## Median follow-up
+
+```{r}
+followup <- survfit(Surv(months, status==1) ~ 1, data = cancer_data)
+```
+
+```{r}
+ggsurvplot(
+    followup,                     # survfit object with calculated statistics.
+    data = cancer_data,  # data used to fit survival curves. 
+    ylab="alive with follow-up (%)",
+    xlab="months",
+    break.time.by = 6,
+    conf.int = FALSE,
+    legend = c(0.81,0.97),
+    legned.title = "",
+    pval=TRUE,
+    surv.scale = "percent",
+    #xlim= c(0,28),
+    break.y.by=0.1,
+    surv.median.line = "hv",
+    palette = c("blue"),
+    #Standard configuration
+    risk.table = c("nrisk_cumcensor"),# show risk table.
+    ggtheme = theme_survminer()+theme(),
+    tables.theme = theme_void() + theme(plot.title = element_text(size =10)),
+    risk.table.y.text.col = T, # colour risk table text annotations.
+    risk.table.y.text = FALSE, # show bars instead of names in text annotations
+    axes.offset=FALSE,
+    risk.table.fontsize =3,
+    tables.height=0.2,
+)
+```
 
 # Modelling
 
@@ -524,15 +703,97 @@ add_p(test=list(all_continuous() ~ "t.test"))
 
 ## Cox Regression - Hazards
 
-# Analysis principles
+![](images/clipboard-1766806917.png)
 
--   Reproducible mindset
+## Cox Regression - Hazards
 
--   Version control
+![](images/clipboard-1741160324.png)
 
--   Be kind to "future you" / others
+## Proportional hazards
 
-\[ Slides for each: coding / git / comments\]
+![](images/clipboard-2495711226.png)
+
+-   Hazard Ratio: The average ratio of these two lines (over the whole period)
+
+## Proportional hazards
+
+![](images/clipboard-3678869280.png)
+
+-   'Baseline hazard' can take any form (i.e. doesn't have to be constant / smooth)
+
+## Non-proportional hazards
+
+![](images/clipboard-3729452211.png)
+
+-   Can appear as curves "crossing" or "diverging"
+
+-   If so, a single number (hazard ratio) may not be the appropriate summary
+
+## Non-proportional hazards
+
+![](images/clipboard-2872613344.png){width="546"}
+
+![](images/clipboard-2755459745.png)
+
+## Cox regression in R
+
+```{r, echo=TRUE}
+cox_model = coxph(Surv(time, status) ~ sex, data = cancer)
+summary(cox_model)
+```
+
+## Cox regression in R
+
+```{r, echo=TRUE}
+tbl_regression(cox_model,
+               exponentiate = TRUE) %>% 
+  add_global_p()
+
+test.ph <-cox.zph(cox_model)
+ggcoxzph(test.ph)
+
+```
+
+## Univariable models {.r-fit-text}
+
+```{r}
+tbl_uvregression(
+  method = coxph,
+  include = c(sex, age, age_10, ph.ecog, ecog, ph.karno_10, meal.cal_1000, wt.loss_10),
+  y = Surv(time, status),
+  exponentiate = TRUE,
+  data = cancer_data
+) %>%
+  add_global_p()
+```
+
+::: note
+-   age vs age_10?
+-   ph.ecog vs ecog?
+:::
+
+## Multivariable model
+
+```{r}
+m2 <- coxph(Surv(months,status) ~ sex + age_10 + ecog + ph.karno_10 + meal.cal_1000 + wt.loss_10, data= cancer_data)
+tbl_regression(m2, exponentiate=TRUE)
+```
+
+# Summary
+
+-   Use any package (one you can get support with)
+
+-   Have a reproducible mindset (make life easy)
+
+-   Use version control (keep things tidy)
+
+-   Write comments for "future you" / others
+
+## Survey part 2
+
+Please complete the 2nd part of the survey now... I really appreciate your feedback (use QR only if lost the page)
+
+![](images/clipboard-2128009121.png)
 
 # Data management
 
@@ -546,4 +807,4 @@ add_p(test=list(all_continuous() ~ "t.test"))
 
 ## SPSS Tidy
 
-![](images/clipboard-1088338966.png)
+![](images/clipboard-1088338966.png) :::
