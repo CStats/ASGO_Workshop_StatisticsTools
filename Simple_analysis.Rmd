@@ -1,0 +1,164 @@
+---
+title: "Untitled"
+author: "Chris Brown"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE)
+
+library(openxlsx)
+library(dplyr)
+library(gtsummary)
+library(ggplot2)
+
+library(wordcloud)
+library(tm)
+
+responses <- read.xlsx("AOFOG-ASGO Research Workshop_preregistraiton form_20251025 (deidentified).xlsx")
+
+responses_cleaned <- responses %>%
+  mutate(
+    participant = substr(No.,1,1)!="a",
+    `Have.you.ever.participated.in.any.research.workshop?` = recode(`Have.you.ever.participated.in.any.research.workshop?`,"No"="NO")
+  )
+```
+
+## Country
+
+
+```{r}
+capwords <- function(s, strict = FALSE) {
+    cap <- function(s) paste(toupper(substring(s, 1, 1)),
+                  {s <- substring(s, 2); if(strict) tolower(s) else s},
+                             sep = "", collapse = " " )
+    sapply(strsplit(s, split = " "), cap, USE.NAMES = !is.null(names(s)))
+}
+
+countries = responses_cleaned %>%
+  mutate(Country = tolower(Country)) %>%
+  count(Country, sort = TRUE) %>%
+  mutate(Country = capwords(Country))
+
+
+
+responses_cleaned %>% 
+  mutate(Country = tolower(Country)) %>%
+  count(Country,participant, sort = TRUE) %>% 
+  mutate(
+    Country = capwords(Country)
+  ) %>% 
+  # stacked bar plot
+  ggplot(aes(x=reorder(Country,n),y=n, fill=participant))+
+  geom_bar(stat="identity")+
+  #set tick marks as 1
+  scale_y_continuous(breaks = seq(0, max(countries$n)+1, by = 1))+
+  coord_flip()
+```
+
+## Specialty
+
+
+```{r}
+
+responses_cleaned %>% 
+ # mutate(Specialty = tolower(Specialty)) %>%
+  count(Specialty,participant, sort = TRUE) %>% 
+  mutate(
+   # Country = capwords(Specialty)
+  ) %>% 
+  # stacked bar plot
+  ggplot(aes(x=reorder(Specialty,n),y=n, fill=participant))+
+  geom_bar(stat="identity")+
+  #set tick marks as 1
+  #scale_y_continuous(breaks = seq(0, max(countries$n)+1, by = 1))+
+  coord_flip()
+```
+
+# Years of experience
+
+```{r}
+# responses_cleaned %>% 
+#   select(participant,Years.of.completion.of.oncology.training)
+#   
+```
+
+
+
+# Age, source & research experience
+
+```{r cars}
+responses_cleaned %>% 
+  select(participant,Age.range,
+         `How.do.you.know.about.this.course?`,
+         `Have.you.participated.in.any.research?`,
+        ) %>% 
+  mutate(
+    `Have.you.participated.in.any.research?` = recode(`Have.you.participated.in.any.research?`,"No"="NO")
+  ) %>% 
+  tbl_summary(by = participant) %>% 
+  add_p()
+
+```
+
+# Reserach 
+
+```{r}
+responses_cleaned %>% 
+  filter(participant) %>% 
+  select(`Is.research.method.training.incorporated.in.your.basic.or.subspecialty.fellowship.training.programme?`:`Have.you.ever.participated.in.any.research.workshop?`) %>% 
+  tbl_summary() %>% 
+  as_flex_table() %>% 
+  flextable::autofit()
+```
+
+
+# Publications
+
+```{r}
+publications = 
+  responses_cleaned %>% 
+  mutate(
+    Publications = case_match(
+      `Total.number.of.publications`,
+      c("Nil","None") ~ "0",
+      "One" ~ "1",
+      "3 (Scopus) 9 (non-Scopus)" ~ "12",
+      .default  = `Total.number.of.publications`
+    ),
+    
+  ) %>% 
+  select(participant,Publications) 
+
+publications %>% 
+  mutate(
+    Publications = as.numeric(Publications)
+  ) %>%
+  tbl_summary(by = participant) 
+```
+
+
+
+# Why participate in this workshop?
+
+the most frequent terms mentioned by participants for why they like to participate in this workshop are visualized below:
+
+```{r pressure, echo=FALSE}
+responses_cleaned %>% 
+  select(`Why.do.you.like.to.participate.in.this.workshop?`) %>% 
+  wordcloud()
+```
+
+After excluding punctuation and common words
+
+```{r , echo=FALSE}
+# Remove punctuation and stop words (common words)
+docs <- Corpus(VectorSource(responses_cleaned$`Why.do.you.like.to.participate.in.this.workshop?`))
+crude <- tm_map(docs, removePunctuation)
+crude <- tm_map(crude, function(x)removeWords(x,stopwords()))
+wordcloud(crude)
+
+```
+
+
