@@ -2,23 +2,134 @@
 title: "Statistical software and applications"
 subtitle: "Chris Brown, Univeristy of Sydney" 
 #"AOFOG / ASGO Gyn Oncology Research Workshop 2025"
-format: revealjs
+format:   
+  revealjs:
+    progress: true
+    theme: serif
+  pptx:
+    toc: false
 editor: visual
 ---
 
 # Statistical software and applications
 
-\~60min including questions / interaction
+60min including questions / interaction
 
--   Questionnaire (0-5 mins, complete prior to talk?)
+-   Questionnaire (5 mins)
 
 -   Software (20 mins)
 
 -   Statistical tests (30 mins)
 
--   Survey analysis / Questions (5-10 mins)
+-   Survey analysis / Questions (5 mins)
 
-# Software selection
+## Welcome survey
+
+![](images/clipboard-2128009121.png)
+
+-   Then check out these slides + example analysis code ([https://github.com/cstats](https://github.com/CStats/ASGO_Workshop_StatisticsTools){.uri})
+
+::: notes
+<https://redcap.sydney.edu.au/surveys/?s=EHCH7KRKT4THD3MN>
+:::
+
+## Who am I
+
+-   1999: 2002: BSc (Maths / Stats), University of Sydney
+
+-   2002 - 2005: SPSS (Technical Support)
+
+-   2004 - 2027: Masters Biostatistics
+
+-   *2005 - Now: Clinical Trials Centre, University of Sydney*
+
+-   2013 - 2015: Cancer Registry Ireland
+
+-   *2016 - Now: Bean Bar You (Chocolate Subscription)*
+
+::: notes
+-   R \> SPSS \> SAS \> R
+:::
+
+## Survey results
+
+*Currently downloading and processing your results...*
+
+```{r, echo=TRUE}
+library(redcapAPI)
+
+# Read token from API.txt
+read.csv("API.txt", header=FALSE, stringsAsFactors=FALSE) -> api_key
+
+# Connect to recap via API
+rcon <- redcapConnection(
+  url = "https://redcap.sydney.edu.au/api/",
+  token = api_key[1,1]
+)
+
+# Download current responses
+data <- exportRecordsTyped(rcon) 
+```
+
+::: notes
+-   slides written with "chunks" of R, generated using RStudio
+:::
+
+## Survey results - Statistics?
+
+```{r}
+
+library(dplyr)
+library(gtsummary)
+library(ggplot2)
+
+data %>% 
+  filter(!is.na(pre_timestamp)) %>% 
+  mutate(statistics = as.numeric(statistics)) %>% 
+  ggplot(aes(x=statistics))+
+  geom_histogram()+
+  geom_density(colour="blue")+
+  xlab("What's your opinion of Statistics?")
+```
+
+## Survey results - Software?
+
+```{r}
+data %>% 
+  filter(!is.na(pre_timestamp)) %>% 
+  select(starts_with("software")) %>% 
+  mutate(across(everything(), ~if_else(.x == "Checked", TRUE, FALSE))) %>%
+  tbl_summary(
+    label= list(
+      "software___sas" = "SAS",
+      "software___spss" = "SPSS",
+      "software___stata" = "Stata",
+      "software___r" = "R",
+      "software___python" = "Python",
+      "software___git" = "Git",
+      "software___redcap" = "REDCap"
+    ),
+  )
+
+
+```
+
+## Survey results - Focus of this talk?
+
+```{r}
+data %>% 
+  filter(!is.na(pre_timestamp)) %>% 
+  mutate(content = as.numeric(content)) %>% 
+  ggplot(aes(x=content))+
+  geom_histogram()+
+  geom_density(colour="blue")+
+  xlab("Would you prefer session to spend more time on Software or Statistics?")+
+  geom_text(aes(x=50, y=0.5,label="1 = More Software\n100 = More Statistics"),size=5
+  )
+
+```
+
+# Statistical Software
 
 -   SAS
 
@@ -36,7 +147,15 @@ Other common tools:
 
 -   Git
 
-\[ Outline for each: get from / how to use / tricks & tips\]
+::: notes
+-   These are just the common ones (there are lots)
+
+-   Outline for each: get from / how to use / tricks & tips
+
+-   Excel is not a good solution
+
+-   Programming may sound scary but it is worth it / very empowering
+:::
 
 ## Popularity over time
 
@@ -46,33 +165,201 @@ Other common tools:
 
 ## SAS
 
-long time industry standard, companies switching more to to R
+<https://www.sas.com/>
+
+-   Powerful / reliable / just works
+
+-   Was the "standard" for pharmaceutical industry
+
+-   Driven with code (programming)
+
+-   Good sample size program (but is complicated)
+
+-   Expensive / often available via Universities
+
+![](images/clipboard-538516316.png){width="118"}
+
+::: notes
+-   Legion of fans: "SAS Certified"
+
+-   Companies are diversifying and becoming comfortable with R/Python
+:::
 
 ## SPSS
 
-GUI, was popular in medical community (easy to use), still powerful, python integration
+<https://www.ibm.com/products/spss-statistics>
+
+-   GUI (use menus and mouse to set up analyses)
+-   Code option (SPSS Syntax) - Replicate your analysis!!!
+-   Python integration (generate / interact with datasets)
+-   Base + Add-Ins. \~\$150-300 USD/y. Student discounts
+
+![](images/clipboard-2309160551.png)
+
+::: notes
+-   Popular in medical community (hospitals often have access, easy to use).
+
+-   Syntax makes it reproducible
+:::
 
 ## STATA
 
-GUI, popular in Europe, less
+<https://www.stata.com/>
+
+-   GUI well developed
+
+-   Code is more integrated than in SPSS
+
+-   Output text based but can now [create word doc / pdf / html](https://www.stata.com/features/overview/create-word-documents/)
+
+-   USD \~160-510
+
+::: notes
+-   more popular in Europe?
+
+-   (Heath) Economists love it.
+
+-   Outputting of reports is a step forward
+:::
 
 ## R
 
-Open source, huge community, great intergrations
+<https://cran.r-project.org/>
+
+-   Open source (rebuild of a software called S+) = **Free**
+
+-   Code based (People have created GUIs)
+
+-   Huge community, great integrations (
+
+-   [R-Studio](https://posit.co/products/open-source/rstudio/?sid=1) (Posit) fostered the "Tidyverse" which
+
+-   Packages / can get messy / easy to break things
+
+-   Markdown (Quarto) / Shiny = Game changers!
+
+![](images/clipboard-4104427123.png)
+
+::: notes
+-   Flexibility has pros/cons
+
+-   R markdown (text + code -\> report) was game changer
+
+-   Posit invested in the editor / packages that makes code easy
+
+-   AI can help you write code
+:::
 
 ## Python
 
-Powerful, open source, huge community, AI
+<https://www.python.org/>
 
-## REDCap
+-   Not a traditional statistical software package
 
-Open source database system, can retrive data from software
+-   Pandas / NumPy / [Jupyter notebooks](https://jupyter.org/) -\> data science
+
+-   Powerful, open source, huge community, AI
+
+-   Open-source = FREE
+
+-   Packages / can get messy / easy to break things
+
+![](images/clipboard-2013306728.png){width="305"}
+
+::: notes
+-   Very powerful language, more than just statistics
+
+-   Control computer / download/upload data / automate things
+
+-   Jupyter notebooks facilitated research work
+
+-   "Quarto" like R Markdown can run python
+:::
 
 ## Git
 
-Version control
+<https://git-scm.com/>
 
-# Types of data
+-   Version control text files (i.e. code)
+
+-   Record changes over time + explanation of why
+
+-   Able to roll-back to and old version
+
+-   Very useful if collaborating with others
+
+![](images/clipboard-3781116804.png){width="153"}
+
+## Git - Problem
+
+![](images/clipboard-3767456730.png)
+
+## Git - Solution
+
+![](images/clipboard-429044049.png)
+
+## Git - Benefits
+
+-   Backup and Restore.
+-   Synchronization.
+-   Short-term / long-term undo
+-   Track changes
+-   Track Ownership
+-   Sandboxing
+-   Branching and merging
+
+<https://betterexplained.com/articles/a-visual-guide-to-version-control/>
+
+::: notes
+-   **Backup and Restore.** Files are saved as they are edited, and you can jump to any moment in time. Need that file as it was on Feb 23, 2007? No problem.
+
+-   **Synchronization.** Lets people share files and stay up-to-date with the latest version.
+
+-   **Short-term undo.** Monkeying with a file and messed it up? (That’s just like you, isn’t it?). Throw away your changes and go back to the “last known good” version in the database.
+
+-   **Long-term undo.** Sometimes we mess up bad. Suppose you made a change a year ago, and it had a bug. Jump back to the old version, and see what change was made that day.
+
+-   **Track Changes**. As files are updated, you can leave messages explaining why the change happened (stored in the VCS, not the file). This makes it easy to see how a file is evolving over time, and why.
+
+-   **Track Ownership.** A VCS tags every change with the name of the person who made it. Helpful for [~~blamestorming~~](http://www.unwords.com/unword/blamestorming.html) giving credit.
+
+-   **Sandboxing**, or insurance against yourself. Making a big change? You can make temporary changes in an isolated area, test and work out the kinks before “checking in” your changes.
+
+-   **Branching and merging**. A larger sandbox. You can **branch** a copy of your code into a separate area and modify it in isolation (tracking changes separately). Later, you can **merge** your work back into the common area.
+:::
+
+## REDCap
+
+<https://project-redcap.org/>
+
+-   Open source database system
+
+![](images/clipboard-246943709.png){width="654"}
+
+## REDCap (example)
+
+![](images/clipboard-3485340337.png)
+
+# Statistical tests
+
+|                       | H0 true           | H1 true                     |
+|-----------------------|-------------------|-----------------------------|
+| **Fail to reject H0** | Correct           | Type 2 ($\beta$)            |
+| **Reject H0**         | Type 1 ($\alpha$) | Correct (Power = 1-$\beta$) |
+
+## Randomisation
+
+<https://heyspinner.com/random-number-wheel/1-2>
+
+![](images/clipboard-287388969.png){width="507" height="468"}
+
+::: notes
+<https://heyspinner.com/random-number-wheel/1-2>
+:::
+
+## Types of data
+
+## Types of data
 
 -   Binary
 
@@ -82,13 +369,142 @@ Version control
 
 -   Time-to-event
 
-# Common tests
+## Common tests
 
 -   Comparing proportions
 
 -   Comparing continuous
 
 -   Comparing time-to-event
+
+## Example dataset
+
+*From R's "survival" package: "cancer" dataset*
+
+Survival in patients with advanced lung cancer from the North Central Cancer Treatment Group. Performance scores rate how well the patient can perform usual daily activities.
+
+## Example dataset - Variables
+
+| Variable  | Description                              |
+|-----------|------------------------------------------|
+| inst      | Institution code                         |
+| time      | Survival time in days                    |
+| status    | censoring status 1=censored, 2=dead      |
+| age       | Age in years                             |
+| sex       | Male=1 Female=2                          |
+| ph.ecog   | ECOG as rated by the physician.          |
+| ph.karno  | KPS (bad=0, good=100) rated by physician |
+| pat.karno | rated by patient                         |
+| meal.cal  | Calories consumed at meals               |
+| wt.loss   | Weight loss in last six months (pounds)  |
+
+::: notes
+Karnofsky performance score
+:::
+
+# Proportions
+
+```{r, include=FALSE}
+library(dplyr)  # data manipulation / readable code
+library(survminer) # pretty survival plots
+library(survival) # survival analsis
+library(gtsummary)  # nice summary tables
+
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE)  # don't print code in output
+
+data(cancer, package="survival")  # load example dataset
+
+cancer_clean <- cancer %>%
+  mutate(
+    Sex = factor(sex,c(1,2), labels=c("Male","Female")),
+    Event = factor(status, levels=c(2,1), labels=c("Died","Censored")),
+    ECOG = if_else(ph.ecog ==4, 3, ph.ecog),
+    ECOG	= factor(ECOG , levels=c(0,1,2,3), labels=c("0","1","2","3/4")),
+  )
+```
+
+## Power
+
+```{r}
+power.prop.test(n = 14, p1 = .2, p2 = NULL, sig.level = 0.05,
+                power = .8,
+                alternative = c("two.sided", "one.sided"),
+                strict = FALSE, tol = .Machine$double.eps^0.25)
+```
+
+![](images/clipboard-759363916.png)
+
+## Proportions in R
+
+```{r, echo=TRUE}
+tbl_cross(cancer_clean,
+          row=Event,
+          col=Sex,
+          percent = "column"
+) %>% 
+add_p()
+```
+
+## Proportions in SPSS
+
+![](images/clipboard-1864640983.png)
+
+## Proportions in SPSS
+
+![](images/clipboard-2806315982.png)
+
+## Proportions in SPSS
+
+![](images/clipboard-1068179763.png)
+
+## Proportions in SPSS (tidy)
+
+![](images/clipboard-2726006792.png)
+
+# Continuous
+
+## T-Test in R
+
+```{r, echo=TRUE}
+tbl_summary(cancer_clean,
+          include = c(age, meal.cal, wt.loss),
+          statistic = list(all_continuous() ~ "{mean} ({sd})" ),
+          by=sex
+) %>% 
+add_p(test=list(all_continuous() ~ "t.test"))
+
+```
+
+## T-Test in SPSS
+
+![](images/clipboard-786410623.png)
+
+# Time to Event
+
+## Time to event - Data
+
+![](images/clipboard-951579380.png){width="508"}
+
+![](images/clipboard-3746822751.png){width="291" height="18"}
+
+::: notes
+-   replace with example data + R plots
+-   Assumption of "non-informative" censoring
+:::
+
+## Kaplan Meier
+
+![](images/clipboard-2175826611.png)
+
+## Log-rank test
+
+![](images/clipboard-2794141736.png)
+
+::: notes
+-   log rank statistic: essentially squared difference between the average of the two curves / variance of this.
+
+-   No assumptions
+:::
 
 # Modelling
 
@@ -106,6 +522,8 @@ Version control
 
     -   Competing risks
 
+## Cox Regression - Hazards
+
 # Analysis principles
 
 -   Reproducible mindset
@@ -115,3 +533,17 @@ Version control
 -   Be kind to "future you" / others
 
 \[ Slides for each: coding / git / comments\]
+
+# Data management
+
+## SPSS
+
+![](images/clipboard-383844906.png)
+
+## SPSS Dataset
+
+![](images/clipboard-378199739.png)
+
+## SPSS Tidy
+
+![](images/clipboard-1088338966.png)
