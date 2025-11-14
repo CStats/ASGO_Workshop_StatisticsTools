@@ -1,0 +1,54 @@
+﻿* Encoding: UTF-8.
+PRESERVE.
+SET DECIMAL DOT.
+
+GET DATA  /TYPE=TXT
+  /FILE="NCCTG_Lung_Cancer_Data.csv"
+  /ENCODING='UTF8'
+  /DELIMITERS=","
+  /QUALIFIER='"'
+  /ARRANGEMENT=DELIMITED
+  /FIRSTCASE=2
+  /DATATYPEMIN PERCENTAGE=95.0
+  /VARIABLES=
+  inst AUTO
+  time AUTO
+  status AUTO
+  age AUTO
+  sex AUTO
+  ph.ecog AUTO
+  ph.karno AUTO
+  pat.karno AUTO
+  meal.cal AUTO
+  wt.loss AUTO
+  /MAP.
+RESTORE.
+CACHE.
+EXECUTE.
+
+SAVE OUTFILE='Cancer.sav'
+  /COMPRESSED.
+
+
+CROSSTABS
+  /TABLES=status BY sex
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ 
+  /CELLS=COUNT
+  /COUNT ROUND CELL.
+
+
+
+T-TEST GROUPS=sex(1 2)
+  /MISSING=ANALYSIS
+  /VARIABLES=age meal.cal wt.loss
+  /ES DISPLAY(TRUE)
+  /CRITERIA=CI(.95).
+
+
+KM time BY sex
+  /STATUS=status(2)
+  /PRINT MEAN
+  /PLOT SURVIVAL
+  /TEST LOGRANK
+  /COMPARE OVERALL POOLED.
