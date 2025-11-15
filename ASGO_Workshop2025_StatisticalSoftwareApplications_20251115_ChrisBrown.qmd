@@ -89,7 +89,7 @@ library(survminer)
 
 data = data %>% 
   mutate(time = as.POSIXct(pre_timestamp)) %>% 
-  mutate(time_diff = difftime(time,as.POSIXct("2025-11-15 01:37:00"),  units="mins")) %>% 
+  mutate(time_diff = difftime(time,as.POSIXct("2025-11-14 14:00:00"),  units="mins")) %>% 
   filter(time_diff>0)
 ```
 
@@ -264,9 +264,17 @@ Other common tools:
 -   Syntax makes it reproducible
 :::
 
+## SPSS sample dataset
+
+![](images/clipboard-383844906.png)
+
 ## SPSS screenshot
 
 ![](images/clipboard-378199739.png)
+
+## SPSS data view
+
+![](images/clipboard-1088338966.png)
 
 ## STATA
 
@@ -279,6 +287,8 @@ Other common tools:
 -   Output text based but can now [create word doc / pdf / html](https://www.stata.com/features/overview/create-word-documents/)
 
 -   USD \~160-510
+
+![](images/clipboard-3606165708.png){width="185"}
 
 ::: notes
 -   more popular in Europe?
@@ -319,7 +329,7 @@ Other common tools:
 
 -   R markdown (text + code -\> report) was game changer
 
--   Posit invested in the editor / packages that makes code easy
+-   RStudio (now called "Posit") invested in the editor / packages that makes code easy
 
 -   AI can help you write code
 :::
@@ -328,7 +338,15 @@ Other common tools:
 
 ![](images/clipboard-1974645368.png)
 
-## R Shiny
+## R Reproducible research
+
+-   [Literate programming (slides by Jenny Bryan)](https://www2.stat.duke.edu/~rcs46/lectures_2015/01-markdown-git/slides/lit-prog-slides/lit-prog-slides.pdf)
+
+-   [R Markdown "The defintiive guide" Yihui Xie](https://bookdown.org/yihui/rmarkdown/)
+
+    ![](images/clipboard-3883441198.png)
+
+## R Shiny (Interactive
 
 <https://shiny.posit.co/>
 
@@ -362,6 +380,8 @@ Other common tools:
 -   Jupyter notebooks facilitated research work
 
 -   "Quarto" like R Markdown can run python
+
+-   Embed GitHub Copilot in VScode
 :::
 
 ## Git
@@ -380,6 +400,7 @@ Other common tools:
 
 ::: notes
 -   not always easy dealing with branches / merges
+-   even I had a mess with these lecture slides
 :::
 
 ## Git - Problem
@@ -553,6 +574,10 @@ add_p()
 
 ![](images/clipboard-2726006792.png)
 
+## Proportions in Stata
+
+![](images/clipboard-1170174040.png)
+
 # Continuous
 
 ## T-Test in R
@@ -570,6 +595,10 @@ add_p(test=list(all_continuous() ~ "t.test"))
 ## T-Test in SPSS
 
 ![](images/clipboard-786410623.png)
+
+## T-Test in Stata
+
+![](images/clipboard-3233229489.png)
 
 # Time to Event
 
@@ -610,6 +639,33 @@ cancer_data %>%
 fit <- survfit(Surv(time, status) ~ 1, data = cancer)
 plot(fit)
 ```
+
+## Kaplan Meier - Stata
+
+```{Stata}
+* Declare survival data
+stset time, failure(status)
+
+* Plot Kaplan-Meier survival curves by sex
+sts graph, by(sex) title("Kaplan-Meier Survival Curves by Sex")
+
+* Compute log-rank test
+sts test sex
+```
+
+![](images/clipboard-2089031291.png)
+
+## Kaplan Meier - SPSS
+
+![](images/clipboard-3216427961.png)
+
+## Kaplan Meier - SPSS
+
+![](images/clipboard-1985207386.png)
+
+## Kaplan Meier - SPSS
+
+![](images/clipboard-3090162493.png)
 
 ## Log-rank test
 
@@ -685,6 +741,14 @@ ggsurvplot(
 )
 ```
 
+## Competing risks
+
+![](images/clipboard-957385996.png)
+
+## Competing risk - CI
+
+![](images/clipboard-4017955626.png)
+
 # Modelling
 
 -   Regression
@@ -735,6 +799,10 @@ ggsurvplot(
 
 ![](images/clipboard-2755459745.png)
 
+## Sub-groups
+
+![](images/clipboard-3186113513.png)
+
 ## Cox regression in R
 
 ```{r, echo=TRUE}
@@ -754,6 +822,10 @@ ggcoxzph(test.ph)
 
 ```
 
+## Time dependent Cox
+
+![](images/clipboard-3627009564.png)
+
 ## Univariable models {.r-fit-text}
 
 ```{r}
@@ -772,7 +844,7 @@ tbl_uvregression(
 -   ph.ecog vs ecog?
 :::
 
-## Multivariable model
+## Multivariable models
 
 ```{r}
 m2 <- coxph(Surv(months,status) ~ sex + age_10 + ecog + ph.karno_10 + meal.cal_1000 + wt.loss_10, data= cancer_data)
@@ -789,22 +861,32 @@ tbl_regression(m2, exponentiate=TRUE)
 
 -   Write comments for "future you" / others
 
+## GitHub Copilot
+
+<https://docs.github.com/en/copilot>
+
+![](images/clipboard-1582934450.png)
+
+## Reproducible mindset
+
+Aim to be able to run from s**ource program** to **output report** without manual intervention:
+
+-   You won't forget how to run / update things (in 5 years time)
+
+-   Someone else can run it if they want to
+
+-   You can't make copy/paste / typing errors
+
+-   Automatic updates (if you the data changes)
+
+[My poster: Embedding reproducible research principals in clinical trial analyses](https://figshare.com/articles/poster/Embedding_reproducible_research_principals_in_clinical_trial_analyses/9929735?file=17868944)
+
 ## Survey part 2
 
 Please complete the 2nd part of the survey now... I really appreciate your feedback (use QR only if lost the page)
 
 ![](images/clipboard-2128009121.png)
 
-# Data management
+# Thank you
 
-## SPSS
-
-![](images/clipboard-383844906.png)
-
-## SPSS Dataset
-
-![](images/clipboard-378199739.png)
-
-## SPSS Tidy
-
-![](images/clipboard-1088338966.png) :::
+Any questions?
