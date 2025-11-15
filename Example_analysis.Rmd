@@ -15,7 +15,6 @@ output:
 #Install packages (only need to do this once)
 #install.packages(c("tidyverse", "survminer", "gtsummary"))
 
-
 library(dplyr)  # data manipulation / readable code
 library(survminer) # pretty survival plots
 library(survival) # survival analsis
@@ -57,14 +56,27 @@ cancer %>%
 # Time to event
 
 ```{r}
-cancer %>%  
+cancer_data = cancer %>%  
   arrange(-time) %>%
   mutate(order = 1:n()) %>% 
-  ggplot(aes(y=order, x=time, color=factor(status)))+
-  geom_point()+
+  mutate(
+    months = time/30.4375,
+    sex = factor(sex, levels=c(1,2), labels=c("male","female")),
+    age_10 = age/10,
+    ecog = if_else(ph.ecog ==4, 3, ph.ecog),
+    ecog	= factor(ecog , levels=c(0,1,2,3), labels=c("0","1","2","3/4")),
+    ph.karno_10	 = ph.karno	/10,
+    meal.cal_1000 = meal.cal/1000,
+    wt.loss_10 = wt.loss/10
+  )
+
+cancer_data %>% 
+  ggplot(aes(y=order, x=time))+
+  geom_point(data=cancer_data %>% filter(status==1),shape=4)+
   geom_segment(aes(xstart=0, xend=time,yend=order),colour="black", x=0, alpha=0.5)+
   ylab("Participant (ordered by time)")+
-  xlab("Time (days)")
+  xlab("Time (days)")+
+  ggtitle("Survival time (censored marked with x)")
 
 ```
 

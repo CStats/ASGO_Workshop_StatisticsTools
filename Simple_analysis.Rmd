@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "AOFOG-ASGO Research Workshop participants"
 author: "Chris Brown"
 date: "`r Sys.Date()`"
 output: html_document

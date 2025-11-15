@@ -24,7 +24,10 @@ editor: visual
 -   Survey analysis / Questions (5 mins)
 
 ::: notes
--   Set survey timestamp now!
+```         
+<https://redcap.sydney.edu.au/surveys/?s=EHCH7KRKT4THD3MN>
+Set survey timestamp now!
+```
 :::
 
 ## Welcome survey {.r-fit-text layout-ncol="2"}
@@ -38,16 +41,16 @@ editor: visual
 -   Then check out these slides + example analysis code ([https://github.com/cstats](https://github.com/CStats/ASGO_Workshop_StatisticsTools){.uri})
 
 ::: notes
-<https://redcap.sydney.edu.au/surveys/?s=EHCH7KRKT4THD3MN>
+Set survey timestamp now! <https://redcap.sydney.edu.au/surveys/?s=EHCH7KRKT4THD3MN>
 :::
 
 ## Who am I
 
--   1999: 2002: BSc (Maths / Stats), University of Sydney
+-   1999 - 2002: BSc (Maths / Stats), University of Sydney
 
 -   2002 - 2005: SPSS (Technical Support)
 
--   2004 - 2027: Masters Biostatistics
+-   2004 - 2007: Masters Biostatistics
 
 -   *2005 - Now: Clinical Trials Centre, University of Sydney*
 
@@ -237,6 +240,8 @@ Other common tools:
 -   Legion of fans: "SAS Certified"
 
 -   Companies are diversifying and becoming comfortable with R/Python
+
+-   First version 1967 -\> 9.2 2008, 9.3 2011, 9.4 2013
 :::
 
 ## SAS screenshot
@@ -262,6 +267,8 @@ Other common tools:
 -   Popular in medical community (hospitals often have access, easy to use).
 
 -   Syntax makes it reproducible
+
+-   First version 1968
 :::
 
 ## SPSS sample dataset
@@ -296,6 +303,8 @@ Other common tools:
 -   (Heath) Economists love it.
 
 -   Outputting of reports is a step forward
+
+-   1985 first version
 :::
 
 ## STATA screenshot
@@ -334,7 +343,7 @@ Other common tools:
 -   AI can help you write code
 :::
 
-## R screenshot
+## RStudio screenshot
 
 ![](images/clipboard-1974645368.png)
 
@@ -381,8 +390,12 @@ Other common tools:
 
 -   "Quarto" like R Markdown can run python
 
--   Embed GitHub Copilot in VScode
+-   Embed GitHub Copilot in VSCode
 :::
+
+## Python - VSCode
+
+![](images/clipboard-2579202323.png)
 
 ## Git
 
@@ -642,18 +655,9 @@ plot(fit)
 
 ## Kaplan Meier - Stata
 
-```{Stata}
-* Declare survival data
-stset time, failure(status)
+![](images/clipboard-2096223799.png){width="263"}
 
-* Plot Kaplan-Meier survival curves by sex
-sts graph, by(sex) title("Kaplan-Meier Survival Curves by Sex")
-
-* Compute log-rank test
-sts test sex
-```
-
-![](images/clipboard-2089031291.png)
+![](images/clipboard-2089031291.png){width="592"}
 
 ## Kaplan Meier - SPSS
 
@@ -851,6 +855,32 @@ m2 <- coxph(Surv(months,status) ~ sex + age_10 + ecog + ph.karno_10 + meal.cal_1
 tbl_regression(m2, exponentiate=TRUE)
 ```
 
+## Model selection
+
+-   Consider your context and objective
+
+-   ~~Backwards / forwards selection~~
+
+-   Best subset
+
+-   LASSO regression
+
+Want to learn more? Suggest Frank Harrell, Regression Modelling Strategies. <https://hbiostat.org/rmsc/>
+
+::: notes
+Lasso (Least Absolute Shrinkage and Selection Operator) which is a penalised regression (some coefficients shrink to 0).
+:::
+
+## Repeated measures / clustering
+
+-   Mixed effects logistic regression
+
+-   Generalised estimating equations (GEE) 
+
+    ![](images/clipboard-584745290.png){width="460"}
+
+[Katherine E. Francis, Reporting the trajectories of adverse events over the entire treatment course....](https://www.sciencedirect.com/science/article/pii/S0959804921000733)
+
 # Summary
 
 -   Use any package (one you can get support with)
@@ -871,7 +901,7 @@ tbl_regression(m2, exponentiate=TRUE)
 
 Aim to be able to run from s**ource program** to **output report** without manual intervention:
 
--   You won't forget how to run / update things (in 5 years time)
+-   You won't forget how to run / update things (+5 years)
 
 -   Someone else can run it if they want to
 
@@ -886,6 +916,16 @@ Aim to be able to run from s**ource program** to **output report** without manua
 Please complete the 2nd part of the survey now... I really appreciate your feedback (use QR only if lost the page)
 
 ![](images/clipboard-2128009121.png)
+
+## ACORD 2026
+
+Want to develop an trial idea into a full protocol in 6 days?
+
+Consider an ACORD protocol development workshop
+
+<https://www.moga.org.au/2026-acord-workshop>
+
+![](images/clipboard-3798916481.png)
 
 # Thank you
 
