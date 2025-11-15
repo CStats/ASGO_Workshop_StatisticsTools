@@ -6,6 +6,7 @@ format:
   revealjs:
     progress: true
     theme: serif
+    embed-resources: true
   pptx:
     toc: false
 editor: visual
@@ -92,7 +93,7 @@ library(survminer)
 
 data = data %>% 
   mutate(time = as.POSIXct(pre_timestamp)) %>% 
-  mutate(time_diff = difftime(time,as.POSIXct("2025-11-14 14:00:00"),  units="mins")) %>% 
+  mutate(time_diff = difftime(time,as.POSIXct("2025-11-15 14:00:00"),  units="mins")) %>% 
   filter(time_diff>0)
 ```
 
